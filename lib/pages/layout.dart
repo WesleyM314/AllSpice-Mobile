@@ -1,3 +1,4 @@
+import 'package:allspice_mobile/models/spice.dart';
 import 'package:allspice_mobile/pages/recipe_page.dart';
 import 'package:allspice_mobile/pages/settings_page.dart';
 import 'package:allspice_mobile/pages/spice_page.dart';
@@ -16,6 +17,8 @@ class MyLayout extends StatefulWidget {
 class _MyLayoutState extends State<MyLayout> {
   int _currentIndex = 1;
 
+  List<Spice> spices = [];
+
   // final tabs = [
   //   Center(child: Text("Recipes")),
   //   Center(child: Text("Spices")),
@@ -23,11 +26,12 @@ class _MyLayoutState extends State<MyLayout> {
   // ];
 
   PageController _pageController = PageController(initialPage: 1);
-  List<Widget> _screens = [
-    RecipePage(),
-    SpicePage(),
-    SettingsPage(),
-  ];
+  // List<Widget> _screens = [
+  //   RecipePage(),
+  //   SpicePage(),
+  //   SettingsPage(),
+  // ];
+  List<Widget> _screens = [];
 
   void _onPageChanged(int index) {
     setState(() {
@@ -35,8 +39,23 @@ class _MyLayoutState extends State<MyLayout> {
     });
   }
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  // }
+
   @override
   Widget build(BuildContext context) {
+    spices = spices.isNotEmpty
+        ? spices
+        : ModalRoute.of(context)!.settings.arguments as List<Spice>;
+
+    _screens = [
+      RecipePage(),
+      SpicePage(spices: spices),
+      SettingsPage(),
+    ];
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -47,7 +66,7 @@ class _MyLayoutState extends State<MyLayout> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/bg.png"),
+            image: AssetImage("assets/circles.png"),
             alignment: Alignment.bottomRight,
           ),
         ),

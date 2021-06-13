@@ -32,6 +32,9 @@ dependencies:
   # SQFlite for database storage
   sqflite: ^2.0.0+3
 
+  # Loading spinners
+  flutter_spinkit: ^5.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -42,7 +45,7 @@ dev_dependencies:
 # The following section is specific to Flutter.
 flutter:
   assets:
-    - assets/bg.png
+    - assets/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

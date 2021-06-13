@@ -1,3 +1,4 @@
+import 'package:allspice_mobile/pages/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:allspice_mobile/pages/layout.dart';
 import 'package:flutter/services.dart';
@@ -12,20 +13,33 @@ void main() {
   // SystemChrome.setEnabledSystemUIOverlays([
   //   SystemUiOverlay.bottom,
   // ]);
-  runApp(MyApp());
+  // runApp(MyApp());
+  runApp(MaterialApp(
+    theme: ThemeData(
+      primaryColor: mainColor,
+    ),
+    initialRoute: '/',
+    routes: {
+      '/': (context) => Loading(),
+      '/home': (context) => MyLayout(),
+    },
+  ));
 }
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // primarySwatch: Colors.deepOrange,
-        primaryColor: mainColor,
-        // accentColor: mainColor,
-      ),
-      home: MyLayout(),
-    );
-  }
-}
+// class MyApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       // title: 'AllSpice',
+//       theme: ThemeData(
+//         primaryColor: mainColor,
+//       ),
+//       initialRoute: '/home',
+//       routes: {
+//         '/home': (context) => MyLayout(),
+//         // '/amount': (context) => AmountSelect(),
+//       },
+//       // home: MyLayout(),
+//     );
+//   }
+// }
