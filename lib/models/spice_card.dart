@@ -13,6 +13,7 @@ class SpiceCard extends StatefulWidget {
 class _SpiceCardState extends State<SpiceCard> {
   @override
   Widget build(BuildContext context) {
+    double _width = MediaQuery.of(context).size.width * 0.75;
     return Card(
       margin: EdgeInsets.symmetric(vertical: 1, horizontal: 0),
       shadowColor: Color(0xDD000000),
@@ -21,31 +22,37 @@ class _SpiceCardState extends State<SpiceCard> {
       //     borderRadius: BorderRadius.all(Radius.circular(10)),
       //     side: BorderSide(width: 3, color: Colors.blue)),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        // crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 30),
-                child: Text(
-                  widget.spice.name,
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w500,
+          Container(
+            constraints: BoxConstraints(maxWidth: 170),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  // padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+                  padding: EdgeInsets.fromLTRB(10, 10, 5, 10),
+                  child: Text(
+                    widget.spice.name,
+                    textAlign: TextAlign.left,
+                    softWrap: true,
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 30),
+                padding: const EdgeInsets.fromLTRB(1, 30, 15, 30),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
                       onPressed: () {

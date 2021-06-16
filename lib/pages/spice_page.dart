@@ -1,6 +1,7 @@
 import 'package:allspice_mobile/main.dart';
 import 'package:allspice_mobile/models/spice.dart';
 import 'package:allspice_mobile/models/spice_card.dart';
+import 'package:allspice_mobile/pages/add_edit_spice_page.dart';
 import 'package:flutter/material.dart';
 
 class SpicePage extends StatefulWidget {
@@ -45,7 +46,11 @@ class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixi
               size: 35,
             ),
             backgroundColor: mainColor,
-            onPressed: () {},
+            onPressed: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => AddEditSpicePage()),
+              );
+            },
           ),
         ),
       ),

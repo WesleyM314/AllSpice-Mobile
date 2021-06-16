@@ -112,7 +112,7 @@ class _MyLayoutState extends State<MyLayout> {
         onTap: (index) {
           // _pageController.jumpToPage(index);
           _pageController.animateToPage(index,
-              duration: Duration(milliseconds: 400), curve: Curves.decelerate);
+              duration: Duration(milliseconds: 250), curve: Curves.easeInOut);
         },
       ),
     );
