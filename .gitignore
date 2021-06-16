@@ -145,3 +145,10 @@ app.*.map.json
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 .idea/libraries/
+.idea/libraries/Dart_SDK.xml
+.idea/libraries/Dart_SDK.xml
+.idea/libraries/Flutter_Plugins.xml
+
+windows/
+.idea/
+.idea/libraries/
