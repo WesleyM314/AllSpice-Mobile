@@ -17,6 +17,7 @@ void main() {
   runApp(MaterialApp(
     theme: ThemeData(
       primaryColor: mainColor,
+      accentColor: mainColor,
     ),
     initialRoute: '/',
     routes: {

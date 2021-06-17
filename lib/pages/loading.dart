@@ -14,14 +14,14 @@ class _LoadingState extends State<Loading> {
   late List<Spice> spices;
 
   void loadSpices() async {
-    await Future.delayed(Duration(milliseconds: 2000));
+    // await Future.delayed(Duration(milliseconds: 2000));
     this.spices = await SpiceDB.instance.readAll();
     // TODO remove dummy spice
-    this.spices.add(Spice(name: "Oregano", container: 8, favorite: false));
-    this.spices.add(Spice(name: "Cinnamon", container: 3));
-    this.spices.add(Spice(name: "Cloves", container: 5));
-    this.spices.add(Spice(name: "Allspice", container: 0, favorite: true));
-    this.spices.add(Spice(name: "Cream of Tartar", container: 2, favorite: false));
+    // this.spices.add(Spice(name: "Oregano", container: 8, favorite: false));
+    // this.spices.add(Spice(name: "Cinnamon", container: 3));
+    // this.spices.add(Spice(name: "Cloves", container: 5));
+    // this.spices.add(Spice(name: "Allspice", container: 0, favorite: true));
+    // this.spices.add(Spice(name: "Cream of Tartar", container: 2, favorite: false));
     // print(this.spices);
     Navigator.pushReplacementNamed(context, '/home', arguments: spices);
   }

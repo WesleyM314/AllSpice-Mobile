@@ -70,6 +70,20 @@ class SpiceDB {
     return result.map((json) => Spice.fromJson(json)).toList();
   }
 
+  Future<List> readContainers() async {
+    final db = await instance.database;
+    final result = await db.query(
+      tableSpices,
+      columns: [SpiceFields.container],
+    );
+
+    if (result.isNotEmpty) {
+      return result.map((e) => e['${SpiceFields.container}']).toList();
+    } else {
+      return [];
+    }
+  }
+
   Future<int> update(Spice spice) async {
     final db = await instance.database;
 
