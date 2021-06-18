@@ -1,9 +1,9 @@
-import 'package:allspice_mobile/main.dart';
 import 'package:allspice_mobile/models/spice.dart';
 import 'package:allspice_mobile/models/spice_card.dart';
 import 'package:allspice_mobile/models/spice_db.dart';
 import 'package:allspice_mobile/pages/add_edit_spice_page.dart';
 import 'package:flutter/material.dart';
+import 'package:allspice_mobile/constants.dart';
 
 class SpicePage extends StatefulWidget {
   final List<Spice> spices;
@@ -51,7 +51,10 @@ class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixi
               // TODO change to use list retrieved from db
               itemCount: this.spiceList.length,
               itemBuilder: (context, index) {
-                return SpiceCard(spice: this.spiceList[index]);
+                return SpiceCard(
+                  spice: this.spiceList[index],
+                  refreshFunction: refreshList,
+                );
               },
             ),
       floatingActionButton: Container(
@@ -65,6 +68,18 @@ class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixi
             ),
             backgroundColor: mainColor,
             onPressed: () async {
+              if (spiceList.length >= maxNumSpices) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(
+                    "No containers available",
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                  behavior: SnackBarBehavior.floating,
+                ));
+                return;
+              }
               dynamic result = await Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => AddEditSpicePage()),
               );

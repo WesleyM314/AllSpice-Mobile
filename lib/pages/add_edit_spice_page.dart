@@ -1,8 +1,7 @@
+import 'package:allspice_mobile/constants.dart';
 import 'package:allspice_mobile/models/spice.dart';
 import 'package:allspice_mobile/models/spice_db.dart';
 import 'package:flutter/material.dart';
-
-Color _mainColor = Color(0xFFE16723);
 
 class AddEditSpicePage extends StatefulWidget {
   final Spice? spice;
@@ -19,7 +18,8 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
   late bool favorite;
   late int container;
   late String name;
-  List _freeContainers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  // List _freeContainers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  List _freeContainers = List<int>.generate(maxNumSpices, (index) => index);
   late List _takenContainers;
 
   @override
@@ -112,6 +112,7 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                     items: _freeContainers.map((num) {
                       return DropdownMenuItem(
                         value: num,
+                        // child: Text('${num + 1}'),
                         child: Text('$num'),
                       );
                     }).toList(),
@@ -178,7 +179,7 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                           },
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.resolveWith(
-                                (states) => _mainColor),
+                                (states) => mainColor),
                           ),
                           child: Text(
                             "Submit",

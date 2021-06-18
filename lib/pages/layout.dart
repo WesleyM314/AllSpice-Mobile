@@ -3,8 +3,7 @@ import 'package:allspice_mobile/pages/recipe_page.dart';
 import 'package:allspice_mobile/pages/settings_page.dart';
 import 'package:allspice_mobile/pages/spice_page.dart';
 import 'package:flutter/material.dart';
-
-import '../main.dart';
+import 'package:allspice_mobile/constants.dart';
 
 class MyLayout extends StatefulWidget {
   MyLayout({Key? key}) : super(key: key);

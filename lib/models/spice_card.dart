@@ -1,10 +1,13 @@
+import 'package:allspice_mobile/models/spice_db.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:allspice_mobile/models/spice.dart';
 
 class SpiceCard extends StatefulWidget {
   final Spice spice;
-  const SpiceCard({Key? key, required this.spice}) : super(key: key);
+  final Function refreshFunction;
+  const SpiceCard({Key? key, required this.spice, required this.refreshFunction})
+      : super(key: key);
 
   @override
   _SpiceCardState createState() => _SpiceCardState();
@@ -55,8 +58,12 @@ class _SpiceCardState extends State<SpiceCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      onPressed: () {
-                        print("Delete ${widget.spice.name}");
+                      onPressed: () async {
+                        // print("Delete ${widget.spice.name}");
+                        // Show confirmation dialog
+                        await _deleteDialog();
+
+                        widget.refreshFunction();
                       },
                       icon: Icon(
                         Icons.delete_outline,
@@ -106,6 +113,60 @@ class _SpiceCardState extends State<SpiceCard> {
           )
         ],
       ),
+    );
+  }
+
+/**
+ * Build and show confirmation dialog to delete spice
+ */
+
+  Future<void> _deleteDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Confirm Deletion"),
+          content: SingleChildScrollView(
+              child: Column(
+            children: [
+              Text("Are you sure you want to delete ${widget.spice.name}?"),
+            ],
+          )),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                "Delete",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                ),
+              ),
+              onPressed: () async {
+                print("Delete ${widget.spice.name}");
+                await SpiceDB.instance.delete(widget.spice.id!);
+                Navigator.of(context).pop();
+              },
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.resolveWith((states) => Colors.red),
+              ),
+            ),
+            TextButton(
+              child: Text(
+                "Cancel",
+                style: TextStyle(
+                  // color: Colors.black,
+                  fontSize: 15,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+      },
     );
   }
 }

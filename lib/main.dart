@@ -2,8 +2,7 @@ import 'package:allspice_mobile/pages/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:allspice_mobile/pages/layout.dart';
 import 'package:flutter/services.dart';
-
-Color mainColor = Color(0xFFE16723);
+import 'package:allspice_mobile/constants.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
