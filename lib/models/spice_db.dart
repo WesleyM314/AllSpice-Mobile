@@ -1,5 +1,4 @@
 import 'package:allspice_mobile/models/spice.dart';
-import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -65,7 +64,7 @@ class SpiceDB {
 
   Future<List<Spice>> readAll() async {
     final db = await instance.database;
-    final orderBy = '${SpiceFields.name} ASC';
+    final orderBy = '${SpiceFields.favorite} DESC, ${SpiceFields.name} ASC';
     final result = await db.query(tableSpices, orderBy: orderBy);
     return result.map((json) => Spice.fromJson(json)).toList();
   }

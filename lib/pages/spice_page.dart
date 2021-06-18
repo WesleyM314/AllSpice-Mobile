@@ -47,14 +47,19 @@ class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixi
                 fontSize: 30,
               ),
             ))
-          : ListView.builder(
-              // TODO change to use list retrieved from db
-              itemCount: this.spiceList.length,
-              itemBuilder: (context, index) {
-                return SpiceCard(
-                  spice: this.spiceList[index],
-                  refreshFunction: refreshList,
-                );
+          : RefreshIndicator(
+              child: ListView.builder(
+                itemCount: this.spiceList.length,
+                itemBuilder: (context, index) {
+                  return SpiceCard(
+                    spice: this.spiceList[index],
+                    refreshFunction: refreshList,
+                  );
+                },
+                physics: const AlwaysScrollableScrollPhysics(),
+              ),
+              onRefresh: () {
+                return refreshList();
               },
             ),
       floatingActionButton: Container(

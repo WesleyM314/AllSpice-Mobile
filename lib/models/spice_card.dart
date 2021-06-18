@@ -16,7 +16,7 @@ class SpiceCard extends StatefulWidget {
 class _SpiceCardState extends State<SpiceCard> {
   @override
   Widget build(BuildContext context) {
-    double _width = MediaQuery.of(context).size.width * 0.75;
+    // double _width = MediaQuery.of(context).size.width * 0.75;
     return Card(
       margin: EdgeInsets.symmetric(vertical: 1, horizontal: 0),
       shadowColor: Color(0xDD000000),
@@ -82,11 +82,13 @@ class _SpiceCardState extends State<SpiceCard> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () {
+                      onPressed: () async {
                         print("Favorite ${widget.spice.name}");
                         setState(() {
                           widget.spice.favorite = !widget.spice.favorite;
                         });
+                        await SpiceDB.instance.update(widget.spice);
+                        // widget.refreshFunction();
                       },
                       icon: Icon(
                         widget.spice.favorite
@@ -116,9 +118,7 @@ class _SpiceCardState extends State<SpiceCard> {
     );
   }
 
-/**
- * Build and show confirmation dialog to delete spice
- */
+  /// Build and show confirmation dialog to delete spice
 
   Future<void> _deleteDialog() async {
     return showDialog<void>(
