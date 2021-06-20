@@ -28,6 +28,8 @@ class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixi
   Future refreshList() async {
     print("IN REFRESH");
     List<Spice> _s = await SpiceDB.instance.readAll();
+    // Sort alphabetically
+    _s.sort((Spice a, Spice b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     print(_s.map((e) => e.name).toList());
     setState(() {
       spiceList = _s;

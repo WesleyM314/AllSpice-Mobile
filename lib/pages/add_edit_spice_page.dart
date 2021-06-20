@@ -18,6 +18,8 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
   late bool favorite;
   late int container;
   late String name;
+  late bool isUpdate;
+
   // List _freeContainers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   List _freeContainers = List<int>.generate(maxNumSpices, (index) => index);
   late List _takenContainers;
@@ -25,6 +27,8 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
   @override
   void initState() {
     super.initState();
+    // Is this an update or a new spice?
+    isUpdate = widget.spice != null;
 
     checkContainers();
 
@@ -35,21 +39,20 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
   }
 
   void checkContainers() async {
+    // Get free containers
     List _l = await SpiceDB.instance.readContainers();
     _freeContainers.removeWhere((element) => _l.contains(element));
-    setState(() {
-      container = _freeContainers[0];
-    });
-    print("Free containers:");
-    print(_freeContainers);
-  }
 
-  List _getFreeContainers() {
-    List _list = [];
-    for (int i = 0; i < 10; i++) {
-      _list.add(i);
+    // If an update, allow selection of spice's container
+    if (isUpdate) {
+      _freeContainers.add(widget.spice?.container);
     }
-    return _list;
+    _freeContainers.sort();
+    setState(() {
+      if (!isUpdate) {
+        container = _freeContainers[0];
+      }
+    });
   }
 
   @override
@@ -62,6 +65,18 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
   Future createSpice(String name, int container) async {
     Spice _s = Spice(name: name, container: container);
     await SpiceDB.instance.create(_s);
+  }
+
+  Future updateSpice(String name, int container) async {
+    widget.spice?.name = name;
+    widget.spice?.container = container;
+    await SpiceDB.instance.update(widget.spice!);
+  }
+
+  Future<List<Widget>> _fillDropdown() async {
+    List<Widget> _l = [];
+
+    return _l;
   }
 
   @override
@@ -86,6 +101,8 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                 children: [
                   TextFormField(
                     controller: nameController,
+                    autofocus: true,
+                    textCapitalization: TextCapitalization.words,
                     maxLength: 24,
                     decoration: InputDecoration(
                       labelText: "Spice Name",
@@ -105,14 +122,12 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                     style: TextStyle(
                       fontSize: 25,
                     ),
-                    // initialValue: name,
                   ),
                   SizedBox(height: 20),
                   DropdownButtonFormField(
                     items: _freeContainers.map((num) {
                       return DropdownMenuItem(
                         value: num,
-                        // child: Text('${num + 1}'),
                         child: Text('$num'),
                       );
                     }).toList(),
@@ -125,7 +140,9 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                     },
                     isDense: true,
                     decoration: InputDecoration(
-                        labelText: "Container", labelStyle: TextStyle(fontSize: 35)),
+                      labelText: "Container",
+                      labelStyle: TextStyle(fontSize: 35),
+                    ),
                   ),
                   SizedBox(height: 20),
                   Row(
@@ -146,8 +163,9 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                             ),
                           ),
                           style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.resolveWith(
-                                  (states) => Colors.grey)),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith(
+                                      (states) => Colors.grey)),
                         ),
                       ),
 
@@ -158,20 +176,22 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                         child: ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
                                 content: Text("Spice registered!"),
                                 behavior: SnackBarBehavior.floating,
                                 // shape: RoundedRectangleBorder(
                                 //     borderRadius: BorderRadius.circular(20)),
                               ));
 
-                              // TODO DEBUGGING
-                              // String _s = nameController.text.trim();
-                              print("Entered name: ${nameController.text.trim()};");
-                              print("Selected container: $container;");
-
-                              print("ADDING SPICE TO DB");
-                              createSpice(nameController.text.trim(), container);
+                              // Update
+                              if (isUpdate) {
+                                updateSpice(
+                                    nameController.text.trim(), container);
+                              } else {
+                                createSpice(
+                                    nameController.text.trim(), container);
+                              }
 
                               FocusScope.of(context).unfocus();
                               Navigator.of(context).pop(true);
