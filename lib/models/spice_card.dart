@@ -1,6 +1,5 @@
 import 'package:allspice_mobile/models/spice_db.dart';
 import 'package:allspice_mobile/pages/add_edit_spice_page.dart';
-import 'package:allspice_mobile/pages/amount_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:allspice_mobile/models/spice.dart';
@@ -9,8 +8,7 @@ class SpiceCard extends StatefulWidget {
   final Spice spice;
   final Function refreshFunction;
 
-  const SpiceCard(
-      {Key? key, required this.spice, required this.refreshFunction})
+  const SpiceCard({Key? key, required this.spice, required this.refreshFunction})
       : super(key: key);
 
   @override
@@ -84,7 +82,7 @@ class _SpiceCardState extends State<SpiceCard> {
                             MaterialPageRoute(
                                 builder: (context) =>
                                     AddEditSpicePage(spice: widget.spice)));
-                        if(result != null) {
+                        if (result != null) {
                           widget.refreshFunction();
                         }
                       },

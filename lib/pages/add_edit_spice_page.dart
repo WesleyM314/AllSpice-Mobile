@@ -22,7 +22,7 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
 
   // List _freeContainers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   List _freeContainers = List<int>.generate(maxNumSpices, (index) => index);
-  late List _takenContainers;
+  // late List _takenContainers;
 
   @override
   void initState() {
@@ -73,11 +73,11 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
     await SpiceDB.instance.update(widget.spice!);
   }
 
-  Future<List<Widget>> _fillDropdown() async {
-    List<Widget> _l = [];
-
-    return _l;
-  }
+  // Future<List<Widget>> _fillDropdown() async {
+  //   List<Widget> _l = [];
+  //
+  //   return _l;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -186,11 +186,9 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
 
                               // Update
                               if (isUpdate) {
-                                updateSpice(
-                                    nameController.text.trim(), container);
+                                updateSpice(nameController.text.trim(), container);
                               } else {
-                                createSpice(
-                                    nameController.text.trim(), container);
+                                createSpice(nameController.text.trim(), container);
                               }
 
                               FocusScope.of(context).unfocus();
