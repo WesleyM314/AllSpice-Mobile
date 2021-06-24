@@ -14,9 +14,6 @@ class SpicePage extends StatefulWidget {
 }
 
 class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixin {
-  // Dummy Spices
-  // Spice s1 = Spice(name: "Cinnamon", container: 1);
-  // Spice s2 = Spice(name: "Cloves", container: 2, favorite: true);
   List<Spice> spiceList = [];
 
   @override
@@ -26,7 +23,6 @@ class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixi
   }
 
   Future refreshList() async {
-    print("IN REFRESH");
     List<Spice> _s = await SpiceDB.instance.readAll();
     setState(() {
       spiceList = _s;
@@ -88,11 +84,8 @@ class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixi
                 MaterialPageRoute(builder: (context) => AddEditSpicePage()),
               );
               if (result != null) {
-                print("REFRESH");
                 refreshList();
               }
-              // TODO debugging
-              print("Back on spice list");
             },
           ),
         ),

@@ -18,18 +18,7 @@ class _MyLayoutState extends State<MyLayout> {
 
   List<Spice> spices = [];
 
-  // final tabs = [
-  //   Center(child: Text("Recipes")),
-  //   Center(child: Text("Spices")),
-  //   Center(child: Text("Settings")),
-  // ];
-
   PageController _pageController = PageController(initialPage: 1);
-  // List<Widget> _screens = [
-  //   RecipePage(),
-  //   SpicePage(),
-  //   SettingsPage(),
-  // ];
   List<Widget> _screens = [];
 
   void _onPageChanged(int index) {
@@ -37,11 +26,6 @@ class _MyLayoutState extends State<MyLayout> {
       _currentIndex = index;
     });
   }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  // }
 
   @override
   Widget build(BuildContext context) {

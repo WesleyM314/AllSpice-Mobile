@@ -20,9 +20,7 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
   late String name;
   late bool isUpdate;
 
-  // List _freeContainers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   List _freeContainers = List<int>.generate(maxNumSpices, (index) => index);
-  // late List _takenContainers;
 
   @override
   void initState() {
@@ -72,12 +70,6 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
     widget.spice?.container = container;
     await SpiceDB.instance.update(widget.spice!);
   }
-
-  // Future<List<Widget>> _fillDropdown() async {
-  //   List<Widget> _l = [];
-  //
-  //   return _l;
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -163,9 +155,8 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                             ),
                           ),
                           style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith(
-                                      (states) => Colors.grey)),
+                              backgroundColor: MaterialStateProperty.resolveWith(
+                                  (states) => Colors.grey)),
                         ),
                       ),
 
@@ -176,8 +167,7 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                         child: ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Spice registered!"),
                                 behavior: SnackBarBehavior.floating,
                                 // shape: RoundedRectangleBorder(

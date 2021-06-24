@@ -1,5 +1,6 @@
 import 'package:allspice_mobile/models/spice_db.dart';
 import 'package:allspice_mobile/pages/add_edit_spice_page.dart';
+import 'package:allspice_mobile/pages/amount_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:allspice_mobile/models/spice.dart';
@@ -112,8 +113,17 @@ class _SpiceCardState extends State<SpiceCard> {
                     ),
                     // DISPENSE BUTTON
                     IconButton(
-                      onPressed: () {
+                      onPressed: () async {
                         print("Dispense ${widget.spice.name}");
+                        dynamic result = await Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    AmountPage(spice: widget.spice)));
+                        if (result) {
+                          print("DISPENSE");
+                        } else {
+                          print("CANCEL DISPENSE");
+                        }
                       },
                       icon: Icon(
                         Icons.play_arrow_outlined,
