@@ -117,6 +117,7 @@ class _AmountPageState extends State<AmountPage> {
                     SizedBox(width: 30),
                     ElevatedButton(
                       onPressed: () {
+                        // TODO also return amount information
                         Navigator.of(context).pop(true);
                       },
                       child: Text(
