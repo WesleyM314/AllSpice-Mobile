@@ -154,7 +154,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
           // Tracks when disconnecting process is in progress using the
           // [isDisconnecting] variable
-          connection!.input.listen(null).onDone(() {
+          connection!.input.listen((data) {
+            if (data.isNotEmpty) {
+              print("DATA INCOMING: $data");
+            }
+          }).onDone(() {
             if (isDisconnecting) {
               print("Disconnecting locally");
             } else {

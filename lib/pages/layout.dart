@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:allspice_mobile/bluetooth.dart';
 import 'package:allspice_mobile/models/spice.dart';
 import 'package:allspice_mobile/pages/recipe_page.dart';
@@ -19,6 +22,7 @@ class MyLayout extends StatefulWidget {
 
 class _MyLayoutState extends State<MyLayout> {
   int _currentIndex = 1;
+
   // late int deviceState;
   // List<BluetoothDevice> devicesList = [];
   // bool isDisconnecting = false;
@@ -51,11 +55,14 @@ class _MyLayoutState extends State<MyLayout> {
     // it on
     enableBluetooth();
 
+    // Try to connect to AllSpice device
+    connect();
+
     // Listen for further state changes
     FlutterBluetoothSerial.instance.onStateChanged().listen((BluetoothState state) {
       setState(() {
         bluetoothState = state;
-
+        print("BLUETOOTH STATE CHANGE");
         getPairedDevices();
       });
     });
@@ -165,6 +172,57 @@ class _MyLayoutState extends State<MyLayout> {
 
     setState(() {
       devicesList = devices;
+    });
+  }
+
+  void connect() async {
+    // Get paired devices
+    await getPairedDevices();
+
+    // Attempt connection
+    devicesList.forEach((element) async {
+      if (element.name == "AllSpice") {
+        print("Attempting to connect to AllSpice");
+        if (!isConnected) {
+          // Try connecting using address
+          await BluetoothConnection.toAddress(element.address).then((_connection) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text("Connected to AllSpice!"),
+              behavior: SnackBarBehavior.floating,
+            ));
+
+            print("Connected");
+            connection = _connection;
+
+            setState(() {
+              connected = true;
+            });
+
+            // Tracks when disconnecting process is in progress using
+            // [isDisconnecting] variable
+            //TODO testing input listening
+            connection!.input.listen((Uint8List data) {
+              // print(data.toString());
+              // print("Data incoming: ");
+              // print(ascii.decode(data));
+              inputBuffer.addAll(data);
+              if (ascii.decode(data).contains("\n")) {
+                print("Data Incoming: ${ascii.decode(inputBuffer)}");
+                inputBuffer.clear();
+              }
+            });
+
+            // connection!.input.listen((data) {
+            //   print("DATA INCOMING: ${ascii.decode(data)}");
+            // });
+          }).catchError((error) {
+            print("Cannot connect, exception occurred");
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text("Connection error")));
+            print(error);
+          });
+        }
+      }
     });
   }
 

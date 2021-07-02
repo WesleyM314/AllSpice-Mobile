@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:allspice_mobile/bluetooth.dart';
 import 'package:allspice_mobile/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -116,8 +120,40 @@ class _AmountPageState extends State<AmountPage> {
                     ),
                     SizedBox(width: 30),
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         // TODO also return amount information
+                        // Send dispense command via Bluetooth
+                        // Message format:
+                        // [signal byte, container byte, quantity byte]
+                        List<int> sendBuffer = [];
+                        sendBuffer.add(DISPENSE); // Dispense signal byte
+                        sendBuffer.add(widget.spice.container); // Container byte
+                        // Unit: 0 = tsp, 1 = tbsp
+                        int _count = 0;
+                        if (unit == 0) {
+                          _count = int.parse(numController.text) * 4;
+                          _count += (fraction + 1); // Add 1/4, 1/2, or 3/4
+                        } else if (unit == 1) {
+                          // 3 tsp in 1 tbsp; each dispense is 1/4 tsp
+                          _count = int.parse(numController.text) * 3 * 4;
+                          // 1/4 tbsp = 3/4 tsp = 3 units
+                          // 1/2 tbsp = 1.5 tsp = 6 units
+                          // 3/4 tbsp = 2.25 tsp = 9 units
+                          _count += (fraction + 1) * 3;
+                        }
+
+                        sendBuffer.add(_count);
+                        sendBuffer.addAll(ascii.encode("\r\n"));
+
+                        // Send command via Bluetooth
+                        if (_count > 0) {
+                          connection!.output.add(Uint8List.fromList(sendBuffer));
+                          await connection!.output.allSent;
+                        }
+
+                        // TODO debugging
+                        print(sendBuffer);
+
                         Navigator.of(context).pop(true);
                       },
                       child: Text(

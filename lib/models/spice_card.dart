@@ -1,3 +1,4 @@
+import 'package:allspice_mobile/bluetooth.dart';
 import 'package:allspice_mobile/models/spice_db.dart';
 import 'package:allspice_mobile/pages/add_edit_spice_page.dart';
 import 'package:allspice_mobile/pages/amount_page.dart';
@@ -115,14 +116,21 @@ class _SpiceCardState extends State<SpiceCard> {
                     IconButton(
                       onPressed: () async {
                         print("Dispense ${widget.spice.name}");
-                        dynamic result = await Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    AmountPage(spice: widget.spice)));
-                        if (result) {
-                          print("DISPENSE");
+                        if (connected) {
+                          dynamic result = await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      AmountPage(spice: widget.spice)));
+                          if (result) {
+                            print("DISPENSE");
+                          } else {
+                            print("CANCEL DISPENSE");
+                          }
                         } else {
-                          print("CANCEL DISPENSE");
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text("Bluetooth not connected to AllSpice"),
+                            behavior: SnackBarBehavior.floating,
+                          ));
                         }
                       },
                       icon: Icon(

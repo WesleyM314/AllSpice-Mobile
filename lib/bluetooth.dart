@@ -13,3 +13,4 @@ bool connected = false;
 late int deviceState;
 List<BluetoothDevice> devicesList = [];
 bool isDisconnecting = false;
+List<int> inputBuffer = [];
