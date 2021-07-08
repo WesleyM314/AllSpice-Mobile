@@ -35,6 +35,9 @@ dependencies:
   # Loading spinners
   flutter_spinkit: ^5.0.0
 
+  # Bluetooth serial
+  flutter_bluetooth_serial: ^0.2.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
