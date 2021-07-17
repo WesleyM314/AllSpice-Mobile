@@ -1,39 +1,27 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
-import 'package:allspice_mobile/bluetooth.dart';
-import 'package:allspice_mobile/constants.dart';
+import 'package:allspice_mobile/models/recipe.dart';
 import 'package:allspice_mobile/models/spice_db.dart';
-import 'package:allspice_mobile/pages/add_edit_spice_page.dart';
-import 'package:allspice_mobile/pages/amount_page.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:allspice_mobile/pages/add_edit_recipe_page.dart';
 import 'package:flutter/material.dart';
-import 'package:allspice_mobile/models/spice.dart';
 
-class SpiceCard extends StatefulWidget {
-  final Spice spice;
+class RecipeCard extends StatefulWidget {
+  final Recipe recipe;
   final Function refreshFunction;
 
-  const SpiceCard({Key? key, required this.spice, required this.refreshFunction})
+  const RecipeCard({Key? key, required this.recipe, required this.refreshFunction})
       : super(key: key);
 
   @override
-  _SpiceCardState createState() => _SpiceCardState();
+  _RecipeCardState createState() => _RecipeCardState();
 }
 
-class _SpiceCardState extends State<SpiceCard> {
+class _RecipeCardState extends State<RecipeCard> {
   @override
   Widget build(BuildContext context) {
-    // double _width = MediaQuery.of(context).size.width * 0.75;
     return Card(
       margin: EdgeInsets.symmetric(vertical: 1, horizontal: 0),
       shadowColor: Color(0xDD000000),
       elevation: 3,
-      // shape: RoundedRectangleBorder(
-      //     borderRadius: BorderRadius.all(Radius.circular(10)),
-      //     side: BorderSide(width: 3, color: Colors.blue)),
       child: Row(
-        // crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
@@ -42,10 +30,9 @@ class _SpiceCardState extends State<SpiceCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  // padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
                   padding: EdgeInsets.fromLTRB(10, 10, 5, 10),
                   child: Text(
-                    widget.spice.name,
+                    widget.recipe.name,
                     textAlign: TextAlign.left,
                     softWrap: true,
                     style: TextStyle(
@@ -53,7 +40,7 @@ class _SpiceCardState extends State<SpiceCard> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                ),
+                )
               ],
             ),
           ),
@@ -68,10 +55,7 @@ class _SpiceCardState extends State<SpiceCard> {
                     // DELETE BUTTON
                     IconButton(
                       onPressed: () async {
-                        // print("Delete ${widget.spice.name}");
-                        // Show confirmation dialog
                         await _deleteDialog();
-
                         widget.refreshFunction();
                       },
                       icon: Icon(
@@ -83,11 +67,11 @@ class _SpiceCardState extends State<SpiceCard> {
                     // EDIT BUTTON
                     IconButton(
                       onPressed: () async {
-                        print("Edit ${widget.spice.name}");
+                        print("Edit ${widget.recipe.name}");
                         dynamic result = await Navigator.of(context).push(
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    AddEditSpicePage(spice: widget.spice)));
+                                    AddEditRecipePage(recipe: widget.recipe)));
                         if (result != null) {
                           widget.refreshFunction();
                         }
@@ -101,15 +85,15 @@ class _SpiceCardState extends State<SpiceCard> {
                     // FAVORITE BUTTON
                     IconButton(
                       onPressed: () async {
-                        print("Favorite ${widget.spice.name}");
+                        print("Favorite ${widget.recipe.name}");
                         setState(() {
-                          widget.spice.favorite = !widget.spice.favorite;
+                          widget.recipe.favorite = !widget.recipe.favorite;
                         });
-                        await SpiceDB.instance.updateSpice(widget.spice);
+                        await SpiceDB.instance.updateRecipe(widget.recipe);
                         // widget.refreshFunction();
                       },
                       icon: Icon(
-                        widget.spice.favorite
+                        widget.recipe.favorite
                             ? Icons.favorite
                             : Icons.favorite_border,
                         color: Colors.red[900],
@@ -117,8 +101,9 @@ class _SpiceCardState extends State<SpiceCard> {
                       ),
                     ),
                     // DISPENSE BUTTON
+                    // TODO make sure ingredients are valid, then dispense
                     IconButton(
-                      onPressed: _getAmount,
+                      onPressed: _dispense,
                       icon: Icon(
                         Icons.play_arrow_outlined,
                         color: Colors.green,
@@ -127,7 +112,7 @@ class _SpiceCardState extends State<SpiceCard> {
                     ),
                   ],
                 ),
-              ),
+              )
             ],
           )
         ],
@@ -135,36 +120,21 @@ class _SpiceCardState extends State<SpiceCard> {
     );
   }
 
-  /// Use the amount_page to get an amount and, if
-  /// connection is available, send bluetooth command
-  Future<void> _getAmount() async {
-    print("Dispense ${widget.spice.name}");
-
-    dynamic result = await Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => AmountPage(spice: widget.spice)));
-    if (result != null) {
-      print("DISPENSE");
-      print(result);
-      List<int> sendBuffer = [DISPENSE, widget.spice.container, result];
-      sendBuffer.addAll(ascii.encode("\n"));
-      await sendData(sendBuffer);
-    } else {
-      print("CANCEL DISPENSE");
-    }
+  // TODO send dispense command
+  Future<void> _dispense() async {
+    print("Dispense ${widget.recipe.name}");
   }
 
-  /// Build and show confirmation dialog to delete spice
   Future<void> _deleteDialog() async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Confirm Deletion"),
           content: SingleChildScrollView(
             child: Column(
               children: [
-                Text("Are you sure you want to delete ${widget.spice.name}?"),
+                Text("Are you sure you want to delete ${widget.recipe.name}?"),
               ],
             ),
           ),
@@ -178,12 +148,8 @@ class _SpiceCardState extends State<SpiceCard> {
                 ),
               ),
               onPressed: () async {
-                print("Delete ${widget.spice.name}");
-                List<int> sendBuffer = [DELETE, widget.spice.container];
-                sendBuffer.addAll(ascii.encode("\n"));
-                await sendData(sendBuffer);
-                // TODO wait for device response
-                await SpiceDB.instance.deleteSpice(widget.spice.id!);
+                print("Delete ${widget.recipe.name}");
+                await SpiceDB.instance.deleteRecipe(widget.recipe.id!);
                 Navigator.of(context).pop();
               },
               style: ButtonStyle(
@@ -202,7 +168,7 @@ class _SpiceCardState extends State<SpiceCard> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-            )
+            ),
           ],
         );
       },

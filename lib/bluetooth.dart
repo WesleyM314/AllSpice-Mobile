@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
 // Init BT connection state to be unknown
@@ -14,3 +16,10 @@ late int deviceState;
 List<BluetoothDevice> devicesList = [];
 bool isDisconnecting = false;
 List<int> inputBuffer = [];
+
+Future<void> sendData(List<int> sendBuffer) async {
+  if (connection != null) {
+    connection!.output.add(Uint8List.fromList(sendBuffer));
+    await connection!.output.allSent;
+  }
+}

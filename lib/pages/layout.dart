@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:allspice_mobile/bluetooth.dart';
+import 'package:allspice_mobile/models/recipe.dart';
+import 'package:allspice_mobile/models/screen_args.dart';
 import 'package:allspice_mobile/models/spice.dart';
 import 'package:allspice_mobile/pages/recipe_page.dart';
 import 'package:allspice_mobile/pages/settings_page.dart';
@@ -28,6 +30,7 @@ class _MyLayoutState extends State<MyLayout> {
   // bool isDisconnecting = false;
 
   List<Spice> spices = [];
+  List<Recipe> recipes = [];
 
   PageController _pageController = PageController(initialPage: 1);
   List<Widget> _screens = [];
@@ -70,12 +73,13 @@ class _MyLayoutState extends State<MyLayout> {
 
   @override
   Widget build(BuildContext context) {
-    spices = spices.isNotEmpty
-        ? spices
-        : ModalRoute.of(context)!.settings.arguments as List<Spice>;
+    ScreenArgs args = ModalRoute.of(context)!.settings.arguments as ScreenArgs;
+
+    spices = spices.isNotEmpty ? spices : args.spices;
+    recipes = recipes.isNotEmpty ? recipes : args.recipes;
 
     _screens = [
-      RecipePage(),
+      RecipePage(recipes: recipes),
       SpicePage(spices: spices),
       SettingsPage(),
     ];
@@ -176,6 +180,7 @@ class _MyLayoutState extends State<MyLayout> {
   }
 
   void connect() async {
+    // TODO if connection fails, schedule job to attempt periodically
     // Get paired devices
     await getPairedDevices();
 
@@ -200,7 +205,7 @@ class _MyLayoutState extends State<MyLayout> {
 
             // Tracks when disconnecting process is in progress using
             // [isDisconnecting] variable
-            //TODO testing input listening
+            //TODO handle incoming messages
             connection!.input.listen((Uint8List data) {
               // print(data.toString());
               // print("Data incoming: ");

@@ -9,9 +9,10 @@ import 'package:allspice_mobile/models/spice.dart';
 import 'package:flutter/services.dart';
 
 class AmountPage extends StatefulWidget {
-  final Spice spice;
+  final Spice? spice;
+  final bool dispense;
 
-  const AmountPage({Key? key, required this.spice}) : super(key: key);
+  const AmountPage({Key? key, this.spice, this.dispense = true}) : super(key: key);
 
   @override
   _AmountPageState createState() => _AmountPageState();
@@ -106,7 +107,7 @@ class _AmountPageState extends State<AmountPage> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.of(context).pop(false);
+                        Navigator.of(context).pop();
                       },
                       child: Text(
                         "Cancel",
@@ -121,13 +122,6 @@ class _AmountPageState extends State<AmountPage> {
                     SizedBox(width: 30),
                     ElevatedButton(
                       onPressed: () async {
-                        // TODO also return amount information
-                        // Send dispense command via Bluetooth
-                        // Message format:
-                        // [signal byte, container byte, quantity byte]
-                        List<int> sendBuffer = [];
-                        sendBuffer.add(DISPENSE); // Dispense signal byte
-                        sendBuffer.add(widget.spice.container); // Container byte
                         // Unit: 0 = tsp, 1 = tbsp
                         int _count = 0;
                         if (unit == 0) {
@@ -142,22 +136,12 @@ class _AmountPageState extends State<AmountPage> {
                           _count += (fraction + 1) * 3;
                         }
 
-                        sendBuffer.add(_count);
-                        sendBuffer.addAll(ascii.encode("\r\n"));
-
-                        // Send command via Bluetooth
-                        if (_count > 0) {
-                          connection!.output.add(Uint8List.fromList(sendBuffer));
-                          await connection!.output.allSent;
-                        }
-
-                        // TODO debugging
-                        print(sendBuffer);
-
-                        Navigator.of(context).pop(true);
+                        Navigator.of(context)
+                            .pop(widget.dispense ? _count : [unit, _count]);
                       },
                       child: Text(
-                        "Dispense",
+                        widget.dispense ? "Dispense" : "Confirm",
+                        // "Dispense",
                         style: TextStyle(fontSize: 25),
                       ),
                       style: ButtonStyle(

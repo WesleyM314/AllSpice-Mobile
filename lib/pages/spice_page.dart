@@ -23,7 +23,7 @@ class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixi
   }
 
   Future refreshList() async {
-    List<Spice> _s = await SpiceDB.instance.readAll();
+    List<Spice> _s = await SpiceDB.instance.readAllSpices();
     setState(() {
       spiceList = _s;
     });
@@ -62,35 +62,38 @@ class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixi
         width: 70,
         child: FittedBox(
           child: FloatingActionButton(
+            heroTag: 'spiceBtn',
             child: Icon(
               Icons.add,
               size: 35,
             ),
             backgroundColor: mainColor,
-            onPressed: () async {
-              if (spiceList.length >= maxNumSpices) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(
-                    "No containers available",
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
-                  ),
-                  behavior: SnackBarBehavior.floating,
-                ));
-                return;
-              }
-              dynamic result = await Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => AddEditSpicePage()),
-              );
-              if (result != null) {
-                refreshList();
-              }
-            },
+            onPressed: _registerSpice,
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _registerSpice() async {
+    if (spiceList.length >= MAX_NUM_SPICES) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          "No containers available",
+          style: TextStyle(
+            fontSize: 18,
+          ),
+        ),
+        behavior: SnackBarBehavior.floating,
+      ));
+      return;
+    }
+    dynamic result = await Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => AddEditSpicePage()),
+    );
+    if (result != null) {
+      refreshList();
+    }
   }
 
   @override

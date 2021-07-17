@@ -1,3 +1,6 @@
+import 'package:allspice_mobile/models/ingredient.dart';
+import 'package:allspice_mobile/models/recipe.dart';
+import 'package:allspice_mobile/models/screen_args.dart';
 import 'package:allspice_mobile/models/spice.dart';
 import 'package:allspice_mobile/models/spice_db.dart';
 import 'package:flutter/material.dart';
@@ -12,18 +15,23 @@ class Loading extends StatefulWidget {
 
 class _LoadingState extends State<Loading> {
   late List<Spice> spices;
+  late List<Recipe> recipes;
 
   void loadSpices() async {
-    // await Future.delayed(Duration(milliseconds: 2000));
-    this.spices = await SpiceDB.instance.readAll();
-    // TODO remove dummy spice
-    // this.spices.add(Spice(name: "Oregano", container: 8, favorite: false));
-    // this.spices.add(Spice(name: "Cinnamon", container: 3));
-    // this.spices.add(Spice(name: "Cloves", container: 5));
-    // this.spices.add(Spice(name: "Allspice", container: 0, favorite: true));
-    // this.spices.add(Spice(name: "Cream of Tartar", container: 2, favorite: false));
-    // print(this.spices);
-    Navigator.pushReplacementNamed(context, '/home', arguments: spices);
+    List<Recipe> foo = await SpiceDB.instance.readAllRecipes();
+    print("RECIPES");
+    foo.forEach((e) {
+      print(e.toJson());
+      // print(e.ingredients);
+      e.ingredients?.forEach((element) {
+        print("\t\t${element.toJson()}");
+      });
+    });
+
+    this.spices = await SpiceDB.instance.readAllSpices();
+    this.recipes = await SpiceDB.instance.readAllRecipes();
+    ScreenArgs args = ScreenArgs(spices, recipes);
+    Navigator.pushReplacementNamed(context, '/home', arguments: args);
   }
 
   @override
