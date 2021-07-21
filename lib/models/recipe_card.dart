@@ -1,4 +1,9 @@
+import 'dart:convert';
+
+import 'package:allspice_mobile/bluetooth.dart';
+import 'package:allspice_mobile/constants.dart';
 import 'package:allspice_mobile/models/recipe.dart';
+import 'package:allspice_mobile/models/spice.dart';
 import 'package:allspice_mobile/models/spice_db.dart';
 import 'package:allspice_mobile/pages/add_edit_recipe_page.dart';
 import 'package:flutter/material.dart';
@@ -101,7 +106,6 @@ class _RecipeCardState extends State<RecipeCard> {
                       ),
                     ),
                     // DISPENSE BUTTON
-                    // TODO make sure ingredients are valid, then dispense
                     IconButton(
                       onPressed: _dispense,
                       icon: Icon(
@@ -122,7 +126,31 @@ class _RecipeCardState extends State<RecipeCard> {
 
   // TODO send dispense command
   Future<void> _dispense() async {
+    // Get list of currently registered spices
+    List<Spice> s = await SpiceDB.instance.readAllSpices();
+    List<String> registered = s.map((e) => e.name).toList();
+    List<int> sendBuffer = [DISPENSE_SERIES, widget.recipe.ingredients!.length];
+    widget.recipe.ingredients?.forEach((element) {
+      if (!registered.contains(element.name)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                "This recipe uses a spice that is not registered. Cannot be dispensed."),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+      // Get container for spice
+      sendBuffer
+          .add(s.firstWhere((e) => e.name.compareTo(element.name) == 0).container);
+      // Add amount
+      sendBuffer.add(element.amount);
+    });
+    sendBuffer.addAll(ascii.encode("\n"));
+    await sendData(sendBuffer);
     print("Dispense ${widget.recipe.name}");
+    print("sendBuffer: $sendBuffer");
   }
 
   Future<void> _deleteDialog() async {

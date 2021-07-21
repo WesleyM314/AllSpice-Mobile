@@ -97,6 +97,5 @@ class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixi
   }
 
   @override
-  // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 }

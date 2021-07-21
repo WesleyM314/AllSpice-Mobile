@@ -17,6 +17,8 @@ List<BluetoothDevice> devicesList = [];
 bool isDisconnecting = false;
 List<int> inputBuffer = [];
 
+bool processDone = false;
+
 Future<void> sendData(List<int> sendBuffer) async {
   if (connection != null) {
     connection!.output.add(Uint8List.fromList(sendBuffer));

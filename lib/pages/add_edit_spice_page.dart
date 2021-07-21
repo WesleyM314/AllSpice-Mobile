@@ -142,6 +142,25 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                   ),
                   SizedBox(height: 20),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 50,
+                        width: 140,
+                        child: ElevatedButton(
+                          onPressed: _refill,
+                          child: Text(
+                            "Refill",
+                            style: TextStyle(
+                              fontSize: 25,
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       SizedBox(
@@ -155,7 +174,7 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                             "Cancel",
                             style: TextStyle(
                               fontSize: 25,
-                              color: Colors.black,
+                              color: Colors.white,
                             ),
                           ),
                           style: ButtonStyle(
@@ -232,5 +251,73 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
         ),
       ),
     );
+  }
+
+  void _refill() async {
+    if (connected) {
+      List<int> sendBuffer = [REFILL, widget.spice!.container];
+      sendBuffer.addAll(ascii.encode("\n"));
+      await sendData(sendBuffer);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Refill command sent!",
+            style: TextStyle(
+              fontSize: 15,
+            ),
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      Navigator.of(context).pop();
+      // Stopwatch watch = Stopwatch();
+      // watch.start();
+      // while (!processDone) {
+      //   // Timeout after 5 seconds
+      //   if (watch.elapsedMilliseconds == 5000) {
+      //     watch.stop();
+      //     break;
+      //   }
+      // }
+      // if (processDone) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text(
+      //         "Spice refilled!",
+      //         style: TextStyle(
+      //           fontSize: 15,
+      //         ),
+      //       ),
+      //       behavior: SnackBarBehavior.floating,
+      //     ),
+      //   );
+      //   processDone = false;
+      //   Navigator.of(context).pop();
+      // } else {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text(
+      //         "Failed to refill on AllSpice device. Check your Bluetooth connection and try again.",
+      //         style: TextStyle(
+      //           fontSize: 15,
+      //         ),
+      //       ),
+      //       behavior: SnackBarBehavior.floating,
+      //     ),
+      //   );
+      // }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Bluetooth not connected to AllSpice device; cannot refill.",
+            style: TextStyle(
+              fontSize: 15,
+            ),
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 }

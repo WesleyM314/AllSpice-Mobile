@@ -207,12 +207,13 @@ class _MyLayoutState extends State<MyLayout> {
             // [isDisconnecting] variable
             //TODO handle incoming messages
             connection!.input.listen((Uint8List data) {
-              // print(data.toString());
-              // print("Data incoming: ");
-              // print(ascii.decode(data));
               inputBuffer.addAll(data);
               if (ascii.decode(data).contains("\n")) {
                 print("Data Incoming: ${ascii.decode(inputBuffer)}");
+                if (ascii.decode(inputBuffer).compareTo("DONE\n") == 0) {
+                  print("DONE");
+                  processDone = true;
+                }
                 inputBuffer.clear();
               }
             });
@@ -222,8 +223,10 @@ class _MyLayoutState extends State<MyLayout> {
             // });
           }).catchError((error) {
             print("Cannot connect, exception occurred");
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text("Connection error")));
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text("Connection error"),
+              behavior: SnackBarBehavior.floating,
+            ));
             print(error);
           });
         }

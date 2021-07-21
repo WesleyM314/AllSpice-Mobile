@@ -118,158 +118,169 @@ class _AddEditRecipePageState extends State<AddEditRecipePage> {
             padding: const EdgeInsets.all(12),
             child: Form(
               key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextFormField(
-                    controller: nameController,
-                    autofocus: false,
-                    textCapitalization: TextCapitalization.words,
-                    maxLength: 50,
-                    decoration: InputDecoration(
-                      labelText: "Recipe Name",
-                      labelStyle: TextStyle(fontSize: 26),
-                      errorStyle: TextStyle(fontSize: 16),
-                    ),
-                    validator: (value) {
-                      value?.trim();
-                      if (value == null || value.isEmpty) {
-                        return "Please add a name for the recipe";
-                      }
-                      return null;
-                    },
-                    style: TextStyle(fontSize: 25),
-                  ),
-                  SizedBox(height: 0),
-                  Container(
-                    // constraints: BoxConstraints(maxHeight: 800),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: this._dropdowns.length,
-                      itemBuilder: (context, index) {
-                        return _dropdowns[index];
-                      },
-                      physics: const AlwaysScrollableScrollPhysics(),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Row(
+              child: Container(
+                alignment: Alignment.center,
+                child: SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 50,
-                          child: ElevatedButton(
-                            child: Text(
-                              "Add a Spice",
-                              style: TextStyle(
-                                color: _dropdowns.length > MAX_NUM_SPICES - 1
-                                    ? Colors.black
-                                    : Colors.white,
-                                fontSize: 20,
+                      TextFormField(
+                        controller: nameController,
+                        autofocus: false,
+                        textCapitalization: TextCapitalization.words,
+                        maxLength: 50,
+                        decoration: InputDecoration(
+                          labelText: "Recipe Name",
+                          labelStyle: TextStyle(fontSize: 26),
+                          errorStyle: TextStyle(fontSize: 16),
+                        ),
+                        validator: (value) {
+                          value?.trim();
+                          if (value == null || value.isEmpty) {
+                            return "Please add a name for the recipe";
+                          }
+                          return null;
+                        },
+                        style: TextStyle(fontSize: 25),
+                      ),
+                      SizedBox(height: 0),
+                      Container(
+                        // constraints: BoxConstraints(maxHeight: 800),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: this._dropdowns.length,
+                          itemBuilder: (context, index) {
+                            return _dropdowns[index];
+                          },
+                          physics: const AlwaysScrollableScrollPhysics(),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: SizedBox(
+                              height: 50,
+                              child: ElevatedButton(
+                                child: Text(
+                                  "Add a Spice",
+                                  style: TextStyle(
+                                    color: _dropdowns.length > MAX_NUM_SPICES - 1
+                                        ? Colors.black
+                                        : Colors.white,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                onPressed: _add,
+                                style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.resolveWith((states) =>
+                                            _dropdowns.length > MAX_NUM_SPICES - 1
+                                                ? Colors.grey
+                                                : Colors.lightBlue)),
                               ),
                             ),
-                            onPressed: _add,
-                            style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.resolveWith(
-                                    (states) =>
-                                        _dropdowns.length > MAX_NUM_SPICES - 1
-                                            ? Colors.grey
-                                            : Colors.lightBlue)),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      // CANCEL BUTTON
-                      SizedBox(
-                        height: 50,
-                        width: 140,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(
-                            "Cancel",
-                            style: TextStyle(
-                              fontSize: 25,
-                              color: Colors.black,
+                      SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          // CANCEL BUTTON
+                          SizedBox(
+                            height: 50,
+                            width: 140,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                "Cancel",
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.resolveWith(
+                                      (states) => Colors.grey)),
                             ),
                           ),
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.resolveWith(
-                                  (states) => Colors.grey)),
-                        ),
-                      ),
-                      // SUBMIT BUTTON
-                      SizedBox(
-                        height: 50,
-                        width: 140,
-                        child: ElevatedButton(
-                          child: Text(
-                            "Submit",
-                            style: TextStyle(fontSize: 25),
-                          ),
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.resolveWith(
-                                (states) => mainColor),
-                          ),
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              name = nameController.text.trim();
-                              print("isUpdate = $isUpdate");
-                              if (isUpdate) {
-                                _dropdowns
-                                    .removeWhere((element) => element.name!.isEmpty);
-                                List<Ingredient> _i = _dropdowns
-                                    .map((e) => Ingredient(
-                                          name: e.name!,
-                                          amount: e.amount!,
-                                        ))
-                                    .toList();
-                                Recipe _r = widget.recipe!.copy(ingredients: _i);
-                                await SpiceDB.instance.updateRecipe(_r);
+                          // SUBMIT BUTTON
+                          SizedBox(
+                            height: 50,
+                            width: 140,
+                            child: ElevatedButton(
+                              child: Text(
+                                "Submit",
+                                style: TextStyle(fontSize: 25),
+                              ),
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.resolveWith(
+                                    (states) => mainColor),
+                              ),
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  name = nameController.text.trim();
+                                  print("isUpdate = $isUpdate");
+                                  if (isUpdate) {
+                                    _dropdowns.removeWhere((element) =>
+                                        element.name == null ||
+                                        element.name!.isEmpty);
+                                    List<Ingredient> _i = _dropdowns
+                                        .map((e) => Ingredient(
+                                              name: e.name!,
+                                              amount: e.amount!,
+                                            ))
+                                        .toList();
+                                    Recipe _r = widget.recipe!.copy(
+                                      ingredients: _i,
+                                      name: name,
+                                    );
+                                    await SpiceDB.instance.updateRecipe(_r);
 
-                                FocusScope.of(context).unfocus();
-                                Navigator.of(context).pop(true);
-                              } else {
-                                // Make ingredients
-                                _dropdowns
-                                    .removeWhere((element) => element.name!.isEmpty);
-                                List<Ingredient> _i = _dropdowns
-                                    .map((e) => Ingredient(
-                                          name: e.name!,
-                                          amount: e.amount!,
-                                        ))
-                                    .toList();
-                                // Create recipe
-                                Recipe _r = Recipe(name: name, ingredients: _i);
-                                print("ADDING RECIPE");
-                                print("_r: ${_r.toJson()}");
-                                _r.ingredients?.forEach((element) {
-                                  print("i: ${element.toJson()}");
-                                });
-                                _r = await SpiceDB.instance.createRecipe(_r);
-                                print("RECIPE ADDED TO DB");
-                                print("_r: ${_r.toJson()}");
-                                _r.ingredients?.forEach((element) {
-                                  print("i: ${element.toJson()}");
-                                });
+                                    FocusScope.of(context).unfocus();
+                                    Navigator.of(context).pop(true);
+                                  } else {
+                                    // Make ingredients
+                                    _dropdowns.removeWhere((element) =>
+                                        element.name == null ||
+                                        element.name!.isEmpty);
+                                    List<Ingredient> _i = _dropdowns
+                                        .map((e) => Ingredient(
+                                              name: e.name!,
+                                              amount: e.amount!,
+                                            ))
+                                        .toList();
+                                    // Create recipe
+                                    Recipe _r = Recipe(name: name, ingredients: _i);
+                                    print("ADDING RECIPE");
+                                    print("_r: ${_r.toJson()}");
+                                    _r.ingredients?.forEach((element) {
+                                      print("i: ${element.toJson()}");
+                                    });
+                                    _r = await SpiceDB.instance.createRecipe(_r);
+                                    print("RECIPE ADDED TO DB");
+                                    print("_r: ${_r.toJson()}");
+                                    _r.ingredients?.forEach((element) {
+                                      print("i: ${element.toJson()}");
+                                    });
 
-                                FocusScope.of(context).unfocus();
-                                Navigator.of(context).pop(true);
-                              }
-                            }
-                          },
-                        ),
+                                    FocusScope.of(context).unfocus();
+                                    Navigator.of(context).pop(true);
+                                  }
+                                }
+                              },
+                            ),
+                          )
+                        ],
                       )
                     ],
-                  )
-                ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -390,10 +401,17 @@ class _IngredientSelectorState extends State<IngredientSelector> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            constraints: BoxConstraints(maxWidth: 200),
+            constraints: BoxConstraints(maxWidth: 150),
             child: DropdownButtonFormField(
               items: spices.map((spice) {
-                return DropdownMenuItem(value: spice, child: Text('$spice'));
+                return DropdownMenuItem(
+                    value: spice,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      child: Text(
+                        '$spice',
+                      ),
+                    ));
               }).toList(),
               value: name,
               style: TextStyle(fontSize: 22, color: Colors.black),
@@ -406,7 +424,8 @@ class _IngredientSelectorState extends State<IngredientSelector> {
                   // print("Name = $name");
                 });
               },
-              isDense: true,
+              isDense: false,
+              isExpanded: true,
               decoration: InputDecoration(
                 labelText: "Spice",
                 labelStyle: TextStyle(fontSize: 20),
@@ -421,14 +440,6 @@ class _IngredientSelectorState extends State<IngredientSelector> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 showError(),
-                ElevatedButton(
-                  onPressed: _getAmount,
-                  child: _displayAmount(),
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.resolveWith((states) => mainColor),
-                  ),
-                ),
                 SizedBox(
                   width: 15,
                 ),
@@ -455,7 +466,7 @@ class _IngredientSelectorState extends State<IngredientSelector> {
   Widget showError() {
     if (hasError) {
       return Padding(
-        padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
         child: IconButton(
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -474,11 +485,17 @@ class _IngredientSelectorState extends State<IngredientSelector> {
             icon: Icon(
               Icons.report_problem_outlined,
               size: 35,
-              color: Colors.amber,
+              color: Colors.red,
             )),
       );
     } else {
-      return SizedBox();
+      return ElevatedButton(
+        onPressed: _getAmount,
+        child: _displayAmount(),
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.resolveWith((states) => mainColor),
+        ),
+      );
     }
   }
 
