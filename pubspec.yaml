@@ -38,6 +38,9 @@ dependencies:
   # Bluetooth serial
   flutter_bluetooth_serial: ^0.2.2
 
+  # Local notifications
+  flutter_local_notifications: ^6.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

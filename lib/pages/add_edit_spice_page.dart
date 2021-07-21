@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:allspice_mobile/bluetooth.dart';
 import 'package:allspice_mobile/constants.dart';
 import 'package:allspice_mobile/models/spice.dart';
 import 'package:allspice_mobile/models/spice_db.dart';
@@ -20,7 +24,7 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
   late String name;
   late bool isUpdate;
 
-  List _freeContainers = List<int>.generate(maxNumSpices, (index) => index);
+  List _freeContainers = List<int>.generate(MAX_NUM_SPICES, (index) => index);
 
   @override
   void initState() {
@@ -62,13 +66,13 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
 
   Future createSpice(String name, int container) async {
     Spice _s = Spice(name: name, container: container);
-    await SpiceDB.instance.create(_s);
+    await SpiceDB.instance.createSpice(_s);
   }
 
   Future updateSpice(String name, int container) async {
     widget.spice?.name = name;
     widget.spice?.container = container;
-    await SpiceDB.instance.update(widget.spice!);
+    await SpiceDB.instance.updateSpice(widget.spice!);
   }
 
   @override
@@ -138,6 +142,25 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                   ),
                   SizedBox(height: 20),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 50,
+                        width: 140,
+                        child: ElevatedButton(
+                          onPressed: _refill,
+                          child: Text(
+                            "Refill",
+                            style: TextStyle(
+                              fontSize: 25,
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       SizedBox(
@@ -151,7 +174,7 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                             "Cancel",
                             style: TextStyle(
                               fontSize: 25,
-                              color: Colors.black,
+                              color: Colors.white,
                             ),
                           ),
                           style: ButtonStyle(
@@ -165,21 +188,45 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                         height: 50,
                         width: 140,
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
+                              List<int> sendBuffer = [];
+                              // Update
+                              if (isUpdate) {
+                                // If container changed, tell device to delete
+                                // spice at previous container
+                                if (container != widget.spice!.container) {
+                                  sendBuffer
+                                      .addAll([DELETE, widget.spice!.container]);
+                                  sendBuffer.addAll(ascii.encode("\n"));
+                                  await sendData(sendBuffer);
+                                  // TODO wait for device response
+                                  await Future.delayed(Duration(milliseconds: 500));
+                                }
+                                // Send command to register spice; if container is
+                                // the same, device just changes the name
+                                sendBuffer.clear();
+                                sendBuffer.addAll([REGISTER, container]);
+                                sendBuffer.addAll(
+                                    ascii.encode(nameController.text.trim() + "\n"));
+                                await sendData(sendBuffer);
+                                await Future.delayed(Duration(milliseconds: 500));
+                                // TODO wait for response from device
+                                updateSpice(nameController.text.trim(), container);
+                              } else {
+                                // Send Bluetooth command to register spice
+                                sendBuffer.addAll([REGISTER, container]);
+                                sendBuffer.addAll(
+                                    ascii.encode(nameController.text.trim() + "\n"));
+                                await sendData(sendBuffer);
+                                // TODO wait for response from device
+                                createSpice(nameController.text.trim(), container);
+                              }
+
                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Spice registered!"),
                                 behavior: SnackBarBehavior.floating,
-                                // shape: RoundedRectangleBorder(
-                                //     borderRadius: BorderRadius.circular(20)),
                               ));
-
-                              // Update
-                              if (isUpdate) {
-                                updateSpice(nameController.text.trim(), container);
-                              } else {
-                                createSpice(nameController.text.trim(), container);
-                              }
 
                               FocusScope.of(context).unfocus();
                               Navigator.of(context).pop(true);
@@ -204,5 +251,73 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
         ),
       ),
     );
+  }
+
+  void _refill() async {
+    if (connected) {
+      List<int> sendBuffer = [REFILL, widget.spice!.container];
+      sendBuffer.addAll(ascii.encode("\n"));
+      await sendData(sendBuffer);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Refill command sent!",
+            style: TextStyle(
+              fontSize: 15,
+            ),
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      Navigator.of(context).pop();
+      // Stopwatch watch = Stopwatch();
+      // watch.start();
+      // while (!processDone) {
+      //   // Timeout after 5 seconds
+      //   if (watch.elapsedMilliseconds == 5000) {
+      //     watch.stop();
+      //     break;
+      //   }
+      // }
+      // if (processDone) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text(
+      //         "Spice refilled!",
+      //         style: TextStyle(
+      //           fontSize: 15,
+      //         ),
+      //       ),
+      //       behavior: SnackBarBehavior.floating,
+      //     ),
+      //   );
+      //   processDone = false;
+      //   Navigator.of(context).pop();
+      // } else {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text(
+      //         "Failed to refill on AllSpice device. Check your Bluetooth connection and try again.",
+      //         style: TextStyle(
+      //           fontSize: 15,
+      //         ),
+      //       ),
+      //       behavior: SnackBarBehavior.floating,
+      //     ),
+      //   );
+      // }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Bluetooth not connected to AllSpice device; cannot refill.",
+            style: TextStyle(
+              fontSize: 15,
+            ),
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 }

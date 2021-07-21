@@ -134,16 +134,20 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _connect() async {
     if (device == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("No device selected")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("No device selected"),
+        behavior: SnackBarBehavior.floating,
+      ));
     } else {
       print(device);
       // If device selected...
       if (!isConnected) {
         // Try connecting using address
         await BluetoothConnection.toAddress(device!.address).then((_connection) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text("Device connected!")));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Device connected!"),
+            behavior: SnackBarBehavior.floating,
+          ));
           print("Connected to device");
           connection = _connection;
 
@@ -170,8 +174,10 @@ class _SettingsPageState extends State<SettingsPage> {
           });
         }).catchError((error) {
           print("Cannot connect, exception occurred");
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text("Connection error")));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Connection error"),
+            behavior: SnackBarBehavior.floating,
+          ));
           print(error);
         });
       }
@@ -181,8 +187,10 @@ class _SettingsPageState extends State<SettingsPage> {
   void _disconnect() async {
     // Closing BT connection
     await connection!.close();
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text("Device disconnected")));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("Device disconnected"),
+      behavior: SnackBarBehavior.floating,
+    ));
 
     // Update connected variable
     if (!connection!.isConnected) {
