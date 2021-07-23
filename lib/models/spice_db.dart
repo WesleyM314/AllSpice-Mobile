@@ -229,6 +229,12 @@ class SpiceDB {
     );
   }
 
+  Future<int> deleteAllSpices() async {
+    final db = await instance.database;
+
+    return await db.delete(tableSpices);
+  }
+
   Future<int> deleteRecipe(int id) async {
     final db = await instance.database;
     // First delete all ingredients
@@ -244,6 +250,15 @@ class SpiceDB {
       where: '${RecipeFields.id} = ?',
       whereArgs: [id],
     );
+  }
+
+  Future<int> deleteAllRecipes() async {
+    final db = await instance.database;
+    // First delete all ingredients
+    await db.delete(tableIngredients);
+
+    // Then delete all recipes
+    return await db.delete(tableRecipes);
   }
 
   Future close() async {

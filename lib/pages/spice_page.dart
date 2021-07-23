@@ -48,11 +48,12 @@ class _SpicePageState extends State<SpicePage>
       body: this.spiceList.isEmpty
           ? Center(
               child: Text(
-              "No Spices",
-              style: TextStyle(
-                fontSize: 30,
+                "No Spices",
+                style: TextStyle(
+                  fontSize: 30,
+                ),
               ),
-            ))
+            )
           : RefreshIndicator(
               child: ListView.builder(
                 itemCount: this.spiceList.length,
@@ -108,5 +109,5 @@ class _SpicePageState extends State<SpicePage>
   }
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => false;
 }

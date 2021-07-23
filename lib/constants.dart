@@ -10,3 +10,4 @@ const int DELETE = 0x03;
 const int REFILL = 0x04;
 const int DISPENSE_SERIES = 0x05;
 const int LOW_SPICE = 0x06;
+const int DELETE_ALL = 0x07;

@@ -13,7 +13,8 @@ class RecipePage extends StatefulWidget {
   _RecipePageState createState() => _RecipePageState();
 }
 
-class _RecipePageState extends State<RecipePage> with AutomaticKeepAliveClientMixin {
+class _RecipePageState extends State<RecipePage>
+    with AutomaticKeepAliveClientMixin {
   List<Recipe> recipeList = [];
 
   @override
@@ -39,7 +40,7 @@ class _RecipePageState extends State<RecipePage> with AutomaticKeepAliveClientMi
               child: Text(
                 "Recipe Page",
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 30,
                 ),
               ),
             )
@@ -83,5 +84,5 @@ class _RecipePageState extends State<RecipePage> with AutomaticKeepAliveClientMi
   }
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => false;
 }
