@@ -17,6 +17,8 @@ List<BluetoothDevice> devicesList = [];
 bool isDisconnecting = false;
 List<int> inputBuffer = [];
 
+List<int> lowSpices = [];
+
 bool processDone = false;
 
 Future<void> sendData(List<int> sendBuffer) async {

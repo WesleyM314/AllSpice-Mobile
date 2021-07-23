@@ -14,7 +14,8 @@ class SpiceCard extends StatefulWidget {
   final Spice spice;
   final Function refreshFunction;
 
-  const SpiceCard({Key? key, required this.spice, required this.refreshFunction})
+  const SpiceCard(
+      {Key? key, required this.spice, required this.refreshFunction})
       : super(key: key);
 
   @override
@@ -37,7 +38,10 @@ class _SpiceCardState extends State<SpiceCard> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-            constraints: BoxConstraints(maxWidth: 170),
+            // TODO remove negation
+            constraints: BoxConstraints(
+              maxWidth: widget.spice.low ? 125 : 170,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -57,78 +61,83 @@ class _SpiceCardState extends State<SpiceCard> {
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(1, 30, 15, 30),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // DELETE BUTTON
-                    IconButton(
-                      onPressed: () async {
-                        // print("Delete ${widget.spice.name}");
-                        // Show confirmation dialog
-                        await _deleteDialog();
+          Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(1, 30, 15, 30),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // LOW SPICE WARNING
+                      _lowSpice(),
+                      // DELETE BUTTON
+                      IconButton(
+                        onPressed: () async {
+                          // print("Delete ${widget.spice.name}");
+                          // Show confirmation dialog
+                          await _deleteDialog();
 
-                        widget.refreshFunction();
-                      },
-                      icon: Icon(
-                        Icons.delete_outline,
-                        color: Colors.red,
-                        size: 35,
-                      ),
-                    ),
-                    // EDIT BUTTON
-                    IconButton(
-                      onPressed: () async {
-                        print("Edit ${widget.spice.name}");
-                        dynamic result = await Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    AddEditSpicePage(spice: widget.spice)));
-                        if (result != null) {
                           widget.refreshFunction();
-                        }
-                      },
-                      icon: Icon(
-                        Icons.edit_outlined,
-                        color: Colors.blue[900],
-                        size: 35,
+                        },
+                        icon: Icon(
+                          Icons.delete_outline,
+                          color: Colors.red,
+                          size: 35,
+                        ),
                       ),
-                    ),
-                    // FAVORITE BUTTON
-                    IconButton(
-                      onPressed: () async {
-                        print("Favorite ${widget.spice.name}");
-                        setState(() {
-                          widget.spice.favorite = !widget.spice.favorite;
-                        });
-                        await SpiceDB.instance.updateSpice(widget.spice);
-                        // widget.refreshFunction();
-                      },
-                      icon: Icon(
-                        widget.spice.favorite
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: Colors.red[900],
-                        size: 35,
+                      // EDIT BUTTON
+                      IconButton(
+                        onPressed: () async {
+                          print("Edit ${widget.spice.name}");
+                          dynamic result = await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      AddEditSpicePage(spice: widget.spice)));
+                          if (result != null) {
+                            widget.refreshFunction();
+                          }
+                        },
+                        icon: Icon(
+                          Icons.edit_outlined,
+                          color: Colors.blue[900],
+                          size: 35,
+                        ),
                       ),
-                    ),
-                    // DISPENSE BUTTON
-                    IconButton(
-                      onPressed: _getAmount,
-                      icon: Icon(
-                        Icons.play_arrow_outlined,
-                        color: Colors.green,
-                        size: 40,
+                      // FAVORITE BUTTON
+                      IconButton(
+                        onPressed: () async {
+                          print("Favorite ${widget.spice.name}");
+                          setState(() {
+                            widget.spice.favorite = !widget.spice.favorite;
+                          });
+                          await SpiceDB.instance.updateSpice(widget.spice);
+                          // widget.refreshFunction();
+                        },
+                        icon: Icon(
+                          widget.spice.favorite
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: Colors.red[900],
+                          size: 35,
+                        ),
                       ),
-                    ),
-                  ],
+                      // DISPENSE BUTTON
+                      IconButton(
+                        onPressed: _getAmount,
+                        icon: Icon(
+                          Icons.play_arrow_outlined,
+                          color: Colors.green,
+                          size: 40,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           )
         ],
       ),
@@ -140,8 +149,8 @@ class _SpiceCardState extends State<SpiceCard> {
   Future<void> _getAmount() async {
     print("Dispense ${widget.spice.name}");
 
-    dynamic result = await Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => AmountPage(spice: widget.spice)));
+    dynamic result = await Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => AmountPage(spice: widget.spice)));
     if (result != null) {
       print("DISPENSE");
       print(result);
@@ -150,6 +159,29 @@ class _SpiceCardState extends State<SpiceCard> {
       await sendData(sendBuffer);
     } else {
       print("CANCEL DISPENSE");
+    }
+  }
+
+  Widget _lowSpice() {
+    if (widget.spice.low) {
+      return IconButton(
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("This spice may be running low!"),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
+        icon: Icon(
+          Icons.report_problem_outlined,
+          color: Colors.amber,
+          size: 32,
+        ),
+        padding: EdgeInsets.fromLTRB(10, 4, 0, 0),
+      );
+    } else {
+      return SizedBox();
     }
   }
 

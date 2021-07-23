@@ -37,7 +37,8 @@ class SpiceDB {
     ${SpiceFields.id} $idType,
     ${SpiceFields.container} $intType,
     ${SpiceFields.name} $strType,
-    ${SpiceFields.favorite} $boolType
+    ${SpiceFields.favorite} $boolType,
+    ${SpiceFields.low} $boolType
     );
     ''');
     print("Created spice table");
@@ -120,8 +121,8 @@ class SpiceDB {
         where: '${IngredientFields.recipeId} = ?',
         whereArgs: [element.id],
       );
-      element
-          .setIngredients(result.map((json) => Ingredient.fromJson(json)).toList());
+      element.setIngredients(
+          result.map((json) => Ingredient.fromJson(json)).toList());
     });
     return r;
     // return result.map((e) => Ingredient.fromJson(e)).toList();

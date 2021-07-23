@@ -1,3 +1,4 @@
+import 'package:allspice_mobile/bluetooth.dart';
 import 'package:allspice_mobile/models/spice.dart';
 import 'package:allspice_mobile/models/spice_card.dart';
 import 'package:allspice_mobile/models/spice_db.dart';
@@ -13,7 +14,8 @@ class SpicePage extends StatefulWidget {
   _SpicePageState createState() => _SpicePageState();
 }
 
-class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixin {
+class _SpicePageState extends State<SpicePage>
+    with AutomaticKeepAliveClientMixin {
   List<Spice> spiceList = [];
 
   @override
@@ -24,6 +26,15 @@ class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixi
 
   Future refreshList() async {
     List<Spice> _s = await SpiceDB.instance.readAllSpices();
+    if (lowSpices.isNotEmpty) {
+      // For each container in lowSpices, get the appropriate
+      // spice and set low to true
+      Future.forEach(lowSpices, (container) async {
+        Spice cur = _s.firstWhere((spice) => spice.container == container);
+        cur.low = true;
+        await SpiceDB.instance.updateSpice(cur);
+      });
+    }
     setState(() {
       spiceList = _s;
     });
