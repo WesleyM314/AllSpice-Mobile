@@ -97,7 +97,7 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                 children: [
                   TextFormField(
                     controller: nameController,
-                    autofocus: true,
+                    autofocus: !isUpdate,
                     textCapitalization: TextCapitalization.words,
                     maxLength: 24,
                     decoration: InputDecoration(
@@ -178,8 +178,9 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                             ),
                           ),
                           style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.resolveWith(
-                                  (states) => Colors.grey)),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith(
+                                      (states) => Colors.grey)),
                         ),
                       ),
 
@@ -196,34 +197,39 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
                                 // If container changed, tell device to delete
                                 // spice at previous container
                                 if (container != widget.spice!.container) {
-                                  sendBuffer
-                                      .addAll([DELETE, widget.spice!.container]);
+                                  sendBuffer.addAll(
+                                      [DELETE, widget.spice!.container]);
                                   sendBuffer.addAll(ascii.encode("\n"));
                                   await sendData(sendBuffer);
                                   // TODO wait for device response
-                                  await Future.delayed(Duration(milliseconds: 500));
+                                  await Future.delayed(
+                                      Duration(milliseconds: 500));
                                 }
                                 // Send command to register spice; if container is
                                 // the same, device just changes the name
                                 sendBuffer.clear();
                                 sendBuffer.addAll([REGISTER, container]);
-                                sendBuffer.addAll(
-                                    ascii.encode(nameController.text.trim() + "\n"));
+                                sendBuffer.addAll(ascii
+                                    .encode(nameController.text.trim() + "\n"));
                                 await sendData(sendBuffer);
-                                await Future.delayed(Duration(milliseconds: 500));
+                                await Future.delayed(
+                                    Duration(milliseconds: 500));
                                 // TODO wait for response from device
-                                updateSpice(nameController.text.trim(), container);
+                                updateSpice(
+                                    nameController.text.trim(), container);
                               } else {
                                 // Send Bluetooth command to register spice
                                 sendBuffer.addAll([REGISTER, container]);
-                                sendBuffer.addAll(
-                                    ascii.encode(nameController.text.trim() + "\n"));
+                                sendBuffer.addAll(ascii
+                                    .encode(nameController.text.trim() + "\n"));
                                 await sendData(sendBuffer);
                                 // TODO wait for response from device
-                                createSpice(nameController.text.trim(), container);
+                                createSpice(
+                                    nameController.text.trim(), container);
                               }
 
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
                                 content: Text("Spice registered!"),
                                 behavior: SnackBarBehavior.floating,
                               ));
@@ -269,43 +275,13 @@ class _AddEditSpicePageState extends State<AddEditSpicePage> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-      Navigator.of(context).pop();
-      // Stopwatch watch = Stopwatch();
-      // watch.start();
-      // while (!processDone) {
-      //   // Timeout after 5 seconds
-      //   if (watch.elapsedMilliseconds == 5000) {
-      //     watch.stop();
-      //     break;
-      //   }
-      // }
-      // if (processDone) {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     SnackBar(
-      //       content: Text(
-      //         "Spice refilled!",
-      //         style: TextStyle(
-      //           fontSize: 15,
-      //         ),
-      //       ),
-      //       behavior: SnackBarBehavior.floating,
-      //     ),
-      //   );
-      //   processDone = false;
-      //   Navigator.of(context).pop();
-      // } else {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     SnackBar(
-      //       content: Text(
-      //         "Failed to refill on AllSpice device. Check your Bluetooth connection and try again.",
-      //         style: TextStyle(
-      //           fontSize: 15,
-      //         ),
-      //       ),
-      //       behavior: SnackBarBehavior.floating,
-      //     ),
-      //   );
-      // }
+      // Remove from lowSpices
+      if (lowSpices.contains(widget.spice!.container)) {
+        lowSpices.remove(widget.spice!.container);
+        widget.spice!.low = false;
+        SpiceDB.instance.updateSpice(widget.spice!);
+      }
+      Navigator.of(context).pop(true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

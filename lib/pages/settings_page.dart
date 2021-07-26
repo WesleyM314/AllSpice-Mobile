@@ -253,6 +253,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   // Spices
                   List<int> sendBuffer = [DELETE_ALL];
                   sendBuffer.addAll(ascii.encode("\n"));
+                  print("Delete all spices: $sendBuffer}");
                   await sendData(sendBuffer);
                   await SpiceDB.instance.deleteAllSpices();
                 } else {

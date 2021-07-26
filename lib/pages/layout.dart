@@ -209,14 +209,25 @@ class _MyLayoutState extends State<MyLayout> {
 
             // Tracks when disconnecting process is in progress using
             // [isDisconnecting] variable
-            //TODO handle incoming messages
             connection!.input.listen((Uint8List data) {
               inputBuffer.addAll(data);
               if (ascii.decode(inputBuffer).contains("\n")) {
                 print("Data Incoming: ${ascii.decode(inputBuffer)}");
-                if (inputBuffer[0] == LOW_SPICE) {
-                  lowSpices
-                      .addAll(inputBuffer.getRange(1, inputBuffer.length - 1));
+                print("Raw data: $inputBuffer");
+                if (inputBuffer.contains(LOW_SPICE)) {
+                  int start =
+                      inputBuffer.indexWhere((element) => element == LOW_SPICE);
+                  int end =
+                      inputBuffer.lastIndexWhere((element) => element == 10);
+                  List<int> temp = [];
+                  temp.addAll(inputBuffer.getRange(start + 1, end));
+                  temp.forEach((element) {
+                    if (!lowSpices.contains(element - 1)) {
+                      lowSpices.add(element - 1);
+                    }
+                  });
+                  lowSpiceUpdate = true;
+                  print("lowSpices: $lowSpices");
                 }
                 if (ascii.decode(inputBuffer).compareTo("DONE\r\n") == 0) {
                   print("DONE");
