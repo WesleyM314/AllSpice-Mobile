@@ -1,3 +1,4 @@
+import 'package:allspice_mobile/bluetooth.dart';
 import 'package:allspice_mobile/models/spice.dart';
 import 'package:allspice_mobile/models/spice_card.dart';
 import 'package:allspice_mobile/models/spice_db.dart';
@@ -13,17 +14,66 @@ class SpicePage extends StatefulWidget {
   _SpicePageState createState() => _SpicePageState();
 }
 
-class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixin {
+class _SpicePageState extends State<SpicePage>
+    with AutomaticKeepAliveClientMixin {
   List<Spice> spiceList = [];
 
   @override
   void initState() {
     super.initState();
+    spiceList.forEach((element) {
+      if (element.low) {
+        lowSpices.add(element.container);
+      }
+    });
     refreshList();
   }
 
   Future refreshList() async {
     List<Spice> _s = await SpiceDB.instance.readAllSpices();
+    // If new lowSpices entry from AllSpice, update
+    if (lowSpiceUpdate) {
+      print("There's a lowSpice update!");
+      await Future.forEach(lowSpices, (c) async {
+        Spice temp = _s.firstWhere((element) => element.container == c);
+        temp.low = true;
+        await SpiceDB.instance.updateSpice(temp);
+      });
+      lowSpiceUpdate = false;
+      _s = await SpiceDB.instance.readAllSpices();
+    }
+
+    // if (lowSpices.isNotEmpty) {
+    //   // For each container in lowSpices, get the appropriate
+    //   // spice and set low to true
+    //   await Future.forEach(lowSpices, (container) async {
+    //     Spice cur = _s.firstWhere((spice) => spice.container == container);
+    //     cur.low = true;
+    //     await SpiceDB.instance.updateSpice(cur);
+    //   });
+    // }
+
+    _s.forEach((e) {
+      if (e.low) {
+        if (!lowSpices.contains(e.container)) {
+          lowSpices.add(e.container);
+        }
+      } else {
+        if (lowSpices.contains(e.container)) {
+          lowSpices.remove(e.container);
+        }
+      }
+    });
+    print("lowSpices: $lowSpices");
+    if (lowSpices.isNotEmpty) {
+      // For each container in lowSpices, get the appropriate
+      // spice and set low to true
+      Future.forEach(lowSpices, (container) async {
+        Spice cur = _s.firstWhere((spice) => spice.container == container);
+        cur.low = true;
+        await SpiceDB.instance.updateSpice(cur);
+      });
+    }
     setState(() {
       spiceList = _s;
     });
@@ -32,16 +82,22 @@ class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixi
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    if (lowSpiceUpdate) {
+      setState(() {
+        refreshList();
+      });
+    }
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: this.spiceList.isEmpty
           ? Center(
               child: Text(
-              "No Spices",
-              style: TextStyle(
-                fontSize: 30,
+                "No Spices",
+                style: TextStyle(
+                  fontSize: 30,
+                ),
               ),
-            ))
+            )
           : RefreshIndicator(
               child: ListView.builder(
                 itemCount: this.spiceList.length,
@@ -97,5 +153,5 @@ class _SpicePageState extends State<SpicePage> with AutomaticKeepAliveClientMixi
   }
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => false;
 }

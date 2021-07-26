@@ -17,10 +17,14 @@ List<BluetoothDevice> devicesList = [];
 bool isDisconnecting = false;
 List<int> inputBuffer = [];
 
+List<int> lowSpices = [];
+bool lowSpiceUpdate = false;
+
 bool processDone = false;
 
 Future<void> sendData(List<int> sendBuffer) async {
   if (connection != null) {
+    print("Sending $sendBuffer");
     connection!.output.add(Uint8List.fromList(sendBuffer));
     await connection!.output.allSent;
   }

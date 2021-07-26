@@ -5,6 +5,7 @@ import 'package:allspice_mobile/bluetooth.dart';
 import 'package:allspice_mobile/models/recipe.dart';
 import 'package:allspice_mobile/models/screen_args.dart';
 import 'package:allspice_mobile/models/spice.dart';
+import 'package:allspice_mobile/models/spice_db.dart';
 import 'package:allspice_mobile/pages/recipe_page.dart';
 import 'package:allspice_mobile/pages/settings_page.dart';
 import 'package:allspice_mobile/pages/spice_page.dart';
@@ -62,7 +63,9 @@ class _MyLayoutState extends State<MyLayout> {
     connect();
 
     // Listen for further state changes
-    FlutterBluetoothSerial.instance.onStateChanged().listen((BluetoothState state) {
+    FlutterBluetoothSerial.instance
+        .onStateChanged()
+        .listen((BluetoothState state) {
       setState(() {
         bluetoothState = state;
         print("BLUETOOTH STATE CHANGE");
@@ -190,7 +193,8 @@ class _MyLayoutState extends State<MyLayout> {
         print("Attempting to connect to AllSpice");
         if (!isConnected) {
           // Try connecting using address
-          await BluetoothConnection.toAddress(element.address).then((_connection) {
+          await BluetoothConnection.toAddress(element.address)
+              .then((_connection) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text("Connected to AllSpice!"),
               behavior: SnackBarBehavior.floating,
@@ -205,22 +209,33 @@ class _MyLayoutState extends State<MyLayout> {
 
             // Tracks when disconnecting process is in progress using
             // [isDisconnecting] variable
-            //TODO handle incoming messages
             connection!.input.listen((Uint8List data) {
               inputBuffer.addAll(data);
-              if (ascii.decode(data).contains("\n")) {
+              if (ascii.decode(inputBuffer).contains("\n")) {
                 print("Data Incoming: ${ascii.decode(inputBuffer)}");
-                if (ascii.decode(inputBuffer).compareTo("DONE\n") == 0) {
+                print("Raw data: $inputBuffer");
+                if (inputBuffer.contains(LOW_SPICE)) {
+                  int start =
+                      inputBuffer.indexWhere((element) => element == LOW_SPICE);
+                  int end =
+                      inputBuffer.lastIndexWhere((element) => element == 10);
+                  List<int> temp = [];
+                  temp.addAll(inputBuffer.getRange(start + 1, end));
+                  temp.forEach((element) {
+                    if (!lowSpices.contains(element - 1)) {
+                      lowSpices.add(element - 1);
+                    }
+                  });
+                  lowSpiceUpdate = true;
+                  print("lowSpices: $lowSpices");
+                }
+                if (ascii.decode(inputBuffer).compareTo("DONE\r\n") == 0) {
                   print("DONE");
                   processDone = true;
                 }
                 inputBuffer.clear();
               }
             });
-
-            // connection!.input.listen((data) {
-            //   print("DATA INCOMING: ${ascii.decode(data)}");
-            // });
           }).catchError((error) {
             print("Cannot connect, exception occurred");
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(

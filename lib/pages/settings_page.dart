@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:allspice_mobile/bluetooth.dart';
+import 'package:allspice_mobile/constants.dart';
+import 'package:allspice_mobile/models/spice_db.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
@@ -78,17 +80,27 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 ElevatedButton(
-                  onPressed: _sendOnMessage,
-                  child: Text("ON"),
-                ),
-                SizedBox(
-                  width: 20,
+                  onPressed: () async {
+                    _deleteDialog(true);
+                  },
+                  child: Text("Delete All Spices"),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.resolveWith(
+                        (states) => Colors.red),
+                  ),
                 ),
                 ElevatedButton(
-                  onPressed: _sendOffMessage,
-                  child: Text("OFF"),
+                  onPressed: () async {
+                    _deleteDialog(false);
+                  },
+                  child: Text("Delete All Recipes"),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.resolveWith(
+                        (states) => Colors.red),
+                  ),
                 ),
               ],
             )
@@ -143,7 +155,8 @@ class _SettingsPageState extends State<SettingsPage> {
       // If device selected...
       if (!isConnected) {
         // Try connecting using address
-        await BluetoothConnection.toAddress(device!.address).then((_connection) {
+        await BluetoothConnection.toAddress(device!.address)
+            .then((_connection) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("Device connected!"),
             behavior: SnackBarBehavior.floating,
@@ -208,5 +221,67 @@ class _SettingsPageState extends State<SettingsPage> {
   void _sendOffMessage() async {
     connection!.output.add(ascii.encode("0" + "\r\n"));
     await connection!.output.allSent;
+  }
+
+  /// Build and show confirmation dialog to delete spice
+  Future<void> _deleteDialog(bool s) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Confirm Deletion"),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                Text(
+                    "Are you sure you want to delete all ${s ? "spices" : "recipes"}?"),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                "Delete",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                ),
+              ),
+              onPressed: () async {
+                if (s) {
+                  // Spices
+                  List<int> sendBuffer = [DELETE_ALL];
+                  sendBuffer.addAll(ascii.encode("\n"));
+                  print("Delete all spices: $sendBuffer}");
+                  await sendData(sendBuffer);
+                  await SpiceDB.instance.deleteAllSpices();
+                } else {
+                  // Recipes
+                  await SpiceDB.instance.deleteAllRecipes();
+                }
+                Navigator.of(context).pop();
+              },
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.resolveWith((states) => Colors.red),
+              ),
+            ),
+            TextButton(
+              child: Text(
+                "Cancel",
+                style: TextStyle(
+                  // color: Colors.black,
+                  fontSize: 15,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+      },
+    );
   }
 }
